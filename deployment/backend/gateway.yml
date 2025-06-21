@@ -6,13 +6,14 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
+  ingressClassName: nginx
   rules:
     - http:
         paths:
-        - path: /
-          pathType: Prefix
-          backend:
-            service:
-              name: backend-todo
-              port:
-                number: 8080
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: backend-todo
+                port:
+                  number: 8080

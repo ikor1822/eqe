@@ -1,4 +1,4 @@
-apiVersion: v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend-todo
@@ -19,11 +19,11 @@ spec:
           imagePullPolicy: IfNotPresent
           resources:
             limits:
-              cpu: 1000m
-              memory: 1Gi
+              cpu: "1"
+              memory: "1Gi"
             requests:
-              cpu: 100m
-              memory: 128Mi
+              cpu: "100m"
+              memory: "128Mi"
           ports:
             - containerPort: 8080
               name: http
@@ -36,8 +36,20 @@ spec:
             - name: DATABASE_PASSWORD
               value: test
             - name: DATABASE_PORT
-              value: '5432'
+              value: "5432"
             - name: DATABASE_URL
-              value: postgres.practice.svc.cluster.local
+              value: "postgres.practice.svc.cluster.local"
             - name: DATABASE_NAME
               value: todo_list
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 5
