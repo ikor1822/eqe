@@ -1,0 +1,20 @@
+services:
+  frontend-todo-list:
+    image: romanowalex/frontend-todo-list:v2.0
+    container_name: frontend-todo-list
+    environment:
+      BACKEND_HOST: backend-todo-list
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --fail http://localhost || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "80:80"
+    depends_on:
+      backend-todo-list:
+        condition: service_healthy
+    networks:
+      default:
+        aliases:
+          - todo-list.local

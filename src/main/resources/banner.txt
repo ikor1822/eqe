@@ -1,0 +1,17 @@
+  _____ ___  ____   ___    _     _     _
+ |_   _/ _ \|  _ \ / _ \  | |   (_)___| |_
+   | || | | | | | | | | | | |   | / __| __|
+   | || |_| | |_| | |_| | | |___| \__ \ |_
+   |_| \___/|____/ \___/  |_____|_|___/\__|
+==========================================================================================
+Profile: ${spring.profiles.active}
+Application name: ${spring.application.name}
+Application version: ${git.build.version}
+==========================================================================================
+Built from branch: ${git.branch}
+Commit id: ${git.commit.id.abbrev}
+Commit time: ${git.commit.time}
+==========================================================================================
+OAuth2 security enabled: ${oauth2.security.enabled}
+OAuth2 login redirect uri: ${oauth2.login.redirect-uri}
+==========================================================================================

@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DATABASE_HOST:postgres}:${DATABASE_PORT:5432}/${DATABASE_NAME:todo_list}
+    username: ${DATABASE_USER:program}
+    password: ${DATABASE_PASSWORD:test}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+management:
+  otlp:
+    tracing:
+      endpoint: ${TRACING_ENDPOINT:http://jaeger:4318/v1/traces}
+
+logging:
+  pattern:
+    correlation: "[${spring.application.name},%X{traceId:-},%X{spanId:-}]"

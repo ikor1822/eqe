@@ -1,0 +1,62 @@
+spring:
+  application.name: todo-list
+  profiles:
+    active: local
+  config:
+    import: optional:git.properties
+
+server:
+  port: 8080
+  forward-headers-strategy: framework
+  servlet:
+    context-path: /backend
+    session:
+      cookie:
+        http-only: off
+        max-age: 86400
+
+management:
+  otlp:
+    tracing:
+      endpoint: ${COLLECTOR_ENDPOINT:http://localhost:4318/v1/traces}
+  tracing:
+    enabled: ${TRACING_ENABLED:false}
+    sampling:
+      probability: 1.0
+  credentials:
+    user: management
+    password: test
+    role: MANAGEMENT
+  endpoint:
+    health.probes.enabled: true
+  endpoints:
+    web:
+      base-path: /manage
+      exposure.include: info,health,loggers,prometheus
+  health.diskspace.enabled: false
+  metrics.tags:
+    application: ${spring.application.name}
+  endpoint.health.show-details: always
+  info.git.mode: simple
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+  health:
+    readinessstate.enabled: true
+    livenessstate.enabled: true
+
+springdoc:
+  api-docs.path: /api-docs
+  paths-to-match: /api/**
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+
+oauth2:
+  security:
+    enabled: ${OAUTH2_SECURITY_ENABLED:false}
+  login:
+    redirect-uri: ${OAUTH2_LOGIN_REDIRECT_URI:/}
+
+index-page:
+  enabled: ${INDEX_PAGE:true}

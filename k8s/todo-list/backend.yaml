@@ -1,0 +1,27 @@
+---
+image:
+  repository: romanowalex/backend-todo-list
+  tag: v2.1
+
+profile: k8s
+
+environments:
+  - name: TRACING_ENABLED
+    value: "false"
+
+metrics:
+  path: "/backend/manage/prometheus"
+
+liveness:
+  path: "/backend/manage/health/liveness"
+
+readiness:
+  path: "/backend/manage/health/readiness"
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 1024Mi
+  limits:
+    cpu: 500m
+    memory: 1024Mi

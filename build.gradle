@@ -1,0 +1,142 @@
+plugins {
+    id "idea"
+    id "jacoco"
+    id "org.jetbrains.kotlin.jvm" version "1.9.25"
+    id "org.jetbrains.kotlin.plugin.jpa" version "1.9.25"
+    id "org.jetbrains.kotlin.plugin.spring" version "1.9.25"
+    id "org.jetbrains.kotlin.kapt" version "1.9.25"
+    id "org.springframework.boot" version "3.4.2"
+    id "io.spring.dependency-management" version "1.1.7"
+    id "org.jlleitschuh.gradle.ktlint" version "12.1.2"
+    id "com.gorylenko.gradle-git-properties" version "2.4.2"
+    id "com.adarshr.test-logger" version "3.2.0"
+    id "io.qameta.allure" version "2.12.0"
+}
+
+ext {
+    jwtVersion = "4.5.0"
+    openApiVersion = "2.8.5"
+    selenideVersion = "7.7.2"
+    allureSelenideVersion = "2.29.1"
+    postgresContainerVersion = "1.20.4"
+}
+
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+        testSourceDirs += file("src/gui/kotlin")
+    }
+}
+
+ktlint {
+    version.set("1.1.1")
+}
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    gui {
+        compileClasspath += sourceSets.main.output + sourceSets.test.output
+        runtimeClasspath += sourceSets.main.output + sourceSets.test.output
+    }
+}
+
+configurations {
+    guiImplementation.extendsFrom testImplementation
+    guiRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+[compileKotlin, compileTestKotlin, compileGuiKotlin]*.kotlinOptions*.jvmTarget = "17"
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-validation"
+    implementation "org.springframework.boot:spring-boot-starter-logging"
+
+    implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
+    implementation "org.springframework.security:spring-security-oauth2-resource-server"
+    implementation "org.springframework.security:spring-security-oauth2-jose"
+    implementation "com.auth0:java-jwt:$jwtVersion"
+
+    implementation "org.postgresql:postgresql"
+    implementation "org.flywaydb:flyway-database-postgresql"
+
+    implementation "io.micrometer:micrometer-registry-prometheus"
+    implementation "io.micrometer:micrometer-tracing-bridge-otel"
+    implementation "io.opentelemetry:opentelemetry-exporter-otlp"
+    implementation "org.springdoc:springdoc-openapi-starter-common:$openApiVersion"
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:$openApiVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "org.jetbrains.kotlin:kotlin-reflect"
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
+
+    kapt "org.springframework.boot:spring-boot-configuration-processor"
+
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation "org.testcontainers:postgresql:$postgresContainerVersion"
+
+    guiImplementation "com.codeborne:selenide:$selenideVersion"
+    guiImplementation "com.codeborne:selenide-selenoid:$selenideVersion"
+    guiImplementation "io.qameta.allure:allure-selenide:$allureSelenideVersion"
+}
+
+abstract class SeleniumTest extends Test {
+    SeleniumTest() {
+        description = "Runs Selenium tests"
+        group = "verification"
+
+        testClassesDirs = project.sourceSets.gui.output.classesDirs
+        classpath = project.sourceSets.gui.runtimeClasspath
+
+        systemProperties["file.encoding"] = "UTF-8"
+        systemProperties["selenide.browser"] = project.findProperty("browser") ?: "chrome"
+        systemProperties["selenide.browserVersion"] = "128.0"
+        systemProperties["base-url"] = project.findProperty("base-url") ?: "http://todo-list.local"
+        systemProperties["chromeoptions.args"] = "--disable-web-security"
+        outputs.upToDateWhen {false}
+    }
+}
+
+allure {
+    adapter {
+        allureJavaVersion = "2.19.0"
+    }
+}
+
+tasks.register("selenide", SeleniumTest) {
+    systemProperties["selenide.browserVersion"] = "131.0"
+}
+
+tasks.register("selenoid", SeleniumTest) {
+    systemProperties["selenide.remote"] = "http://localhost:4444/wd/hub"
+}
+
+tasks.register("moon", SeleniumTest) {
+    systemProperties["selenide.remote"] = "http://moon.romanow-alex.ru/wd/hub"
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
+testlogger {
+    theme "mocha"
+}
+
+processResources {
+    filesMatching(["**/properties-from-gradle.properties"]) {
+        expand(project.properties)
+    }
+}
+
+bootJar {
+    archiveFileName = "${project.name}.jar"
+}

@@ -1,0 +1,35 @@
+{
+  "properties": [
+    {
+      "name": "oauth2.security.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable OAuth2 security.",
+      "defaultValue": "true"
+    },
+    {
+      "name": "oauth2.login.redirect-uri",
+      "type": "java.lang.String",
+      "description": "Login redirect url for OAuth2."
+    },
+    {
+      "name": "management.credentials.user",
+      "type": "java.lang.String",
+      "description": "Management user."
+    },
+    {
+      "name": "management.credentials.password",
+      "type": "java.lang.String",
+      "description": "Management password."
+    },
+    {
+      "name": "management.credentials.role",
+      "type": "java.lang.String",
+      "description": "Management role."
+    },
+    {
+      "name": "index-page.enabled",
+      "type": "java.lang.String",
+      "description": "Flag to enable index page."
+    }
+  ]
+}

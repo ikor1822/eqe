@@ -1,0 +1,7 @@
+users:
+  - name: program
+    password: test
+
+databases:
+  - name: todo_list
+    user: program
